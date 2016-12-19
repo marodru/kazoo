@@ -366,9 +366,12 @@ is_dirty4_test_() ->
     ].
 
 
+maps_take(Key, Map) ->
+    {maps:get(Key, Map), maps:remove(Key, Map)}.
+
 features_5(OldJObj) ->
     OldFeatures = kz_json:to_map(kz_json:get_value(<<"pvt_features">>, OldJObj)),
-    {E911, M} = maps:take(<<"dash_e911">>, OldFeatures),
+    {E911, M} = maps_take(<<"dash_e911">>, OldFeatures),
     M#{<<"e911">> => E911}.
 
 public_fields_new_5(OldJObj) ->
