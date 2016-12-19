@@ -404,7 +404,7 @@ maybe_rename_features(Features) ->
         {undefined, undefined} -> Features;
         {Dash, undefined} -> kz_json:set_value(?FEATURE_E911, Dash, Fs);
         {undefined, Vitelity} -> kz_json:set_value(?FEATURE_E911, Vitelity, Fs);
-        {_Dash, Vitelity} -> kz_json:set_values(?FEATURE_E911, Vitelity, Fs)
+        {_Dash, Vitelity} -> kz_json:set_value(?FEATURE_E911, Vitelity, Fs)
     end.
 
 maybe_update_rw_features(JObj) ->
@@ -415,7 +415,7 @@ maybe_update_rw_features(JObj) ->
         {undefined, undefined} -> JObj;
         {Dash, undefined} -> kz_json:set_value(?FEATURE_E911, Dash, JObj);
         {undefined, Vitelity} -> kz_json:set_value(?FEATURE_E911, Vitelity, JObj);
-        {_Dash, Vitelity} -> kz_json:set_values(?FEATURE_E911, Vitelity, JObj)
+        {_Dash, Vitelity} -> kz_json:set_value(?FEATURE_E911, Vitelity, JObj)
     end.
 
 %% Handle 3.22 -> 4.0 features migration.
