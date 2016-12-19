@@ -54,17 +54,7 @@ delete(Number) ->
 %%--------------------------------------------------------------------
 -spec allowed_features(knm_phone_number:knm_phone_number()) -> ne_binaries().
 allowed_features(PhoneNumber) ->
-    maybe_fix_e911(
-      available_features(knm_phone_number:assigned_to(PhoneNumber))).
-
--spec maybe_fix_e911(ne_binaries()) -> ne_binaries().
-maybe_fix_e911([]) -> [];
-maybe_fix_e911(Features) ->
-    E911 = [<<"dash_e911">>, <<"vitelity_e911">>],
-    case lists:any(fun(F) -> lists:member(F, Features) end, E911) of
-        'true' -> Features ++ [<<"e911">>];
-        'false' -> Features
-    end.
+    available_features(knm_phone_number:assigned_to(PhoneNumber)).
 
 %%--------------------------------------------------------------------
 %% @public
@@ -142,13 +132,7 @@ provider_modules(Number) ->
     AccountId = knm_phone_number:assigned_to(PhoneNumber),
     Possible0 = kz_json:get_keys(knm_phone_number:doc(PhoneNumber)),
     Possible = lists:usort(Possible0 ++ knm_phone_number:features_list(PhoneNumber)),
-    AllowedBase = allowed_features(PhoneNumber),
-    Allowed = case lists:member(?FEATURE_E911, Possible0) of
-                  true -> AllowedBase;
-                  false ->
-                      %% For backward compatibility
-                      AllowedBase ++ [<<"dash_e911">>, <<"vitelity_e911">>]
-              end,
+    Allowed = allowed_features(PhoneNumber),
     lager:debug("allowed ~p, possible ~p", [Allowed, Possible]),
     [provider_module(Feature, AccountId)
      || Feature <- Possible,
@@ -201,21 +185,7 @@ cnam_provider(AccountId) -> ?CNAM_PROVIDER(AccountId).
                   knm_number:knm_number().
 
 exec(Number, Action) ->
-    Number1 = fix_old_fields_names(Number),
-    exec(Number1, Action, provider_modules(Number)).
-
-%% @private
-fix_old_fields_names(Number) ->
-    PN = knm_number:phone_number(Number),
-    Doc = knm_phone_number:doc(PN),
-    Values = props:filter_undefined(
-               [{?FEATURE_E911, kz_json:get_ne_value(<<"dash_e911">>, Doc)}
-               ,{?FEATURE_E911, kz_json:get_ne_value(<<"vitelity_e911">>, Doc)}
-               ]),
-    ToDelete = [<<"dash_e911">>, <<"vitelity_e911">>],
-    NewDoc = kz_json:set_values(Values, kz_json:delete_keys(ToDelete, Doc)),
-    NewPN = knm_phone_number:update_doc(PN, NewDoc),
-    knm_number:set_phone_number(Number, NewPN).
+    exec(Number, Action, provider_modules(Number)).
 
 exec(Number, Action, Providers) ->
     lists:foldl(fun (Provider, N) ->
