@@ -427,6 +427,7 @@ features_fold(FeatureKey, Acc, JObj) ->
     %% Encompasses at least:
     %%   ?FEATURE_PORT & ?FEATURE_FAILOVER
     Data = kz_json:get_ne_value(FeatureKey, JObj, kz_json:new()),
+    lager:debug("emcompassed ~s", [FeatureKey, kz_json:encode(Data)]),
     kz_json:set_value(FeatureKey, Data, Acc).
 
 %%--------------------------------------------------------------------
@@ -995,7 +996,8 @@ set_modified(PN, Modified)
 %% @end
 %%--------------------------------------------------------------------
 -spec created(knm_phone_number()) -> gregorian_seconds().
-created(#knm_phone_number{created=Created}) -> Created.
+created(#knm_phone_number{created = undefined}) -> kz_util:current_tstamp();
+created(#knm_phone_number{created = Created}) -> Created.
 
 -spec set_created(knm_phone_number(), gregorian_seconds()) -> knm_phone_number().
 set_created(PN, Created)
