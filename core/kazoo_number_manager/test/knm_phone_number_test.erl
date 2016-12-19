@@ -370,14 +370,12 @@ features_5(OldJObj) ->
     OldFeatures = kz_json:to_map(kz_json:get_value(<<"pvt_features">>, OldJObj)),
     {E911, M} = maps:take(<<"dash_e911">>, OldFeatures),
     M#{<<"e911">> => E911}.
-    %% OldFeatures = #{<<"dash_e911">> := E911} =
-    %% OldFeatures#{<<"e911">> => E911}.
 
 public_fields_new_5(OldJObj) ->
     M = kz_json:to_map(
           kz_json:public_fields(
             kz_json:delete_key(<<"used_by">>, OldJObj))),
-    maps:merge(features_5(OldJObj), M).
+    M#{<<"e911">> => maps:get(<<"dash_e911">>, M)}.
 
 is_dirty5_test_() ->
     {ok, OldPN} = knm_phone_number:fetch(?TEST_OLD5_NUM),
