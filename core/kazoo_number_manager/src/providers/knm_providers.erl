@@ -65,6 +65,16 @@ delete(Number) ->
 allowed_features(PhoneNumber) ->
     available_features(knm_phone_number:assigned_to(PhoneNumber)).
 
+-spec available_features(api_ne_binary()) -> ne_binaries().
+available_features(undefined) -> [];
+available_features(?MATCH_ACCOUNT_RAW(AccountId)) ->
+    lists:usort(
+      kapps_account_config:get_from_reseller(AccountId
+                                            ,?KNM_CONFIG_CAT
+                                            ,<<"allowed_features">>
+                                            ,?DEFAULT_ALLOWED_FEATURES
+                                            )).
+
 %%--------------------------------------------------------------------
 %% @public
 %% @doc
